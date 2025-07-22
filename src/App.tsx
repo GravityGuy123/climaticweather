@@ -1,9 +1,12 @@
-
-
 import React, { useState, useEffect, useRef } from "react";
 import citiesWithCountry from "./citiesWithCountry.json";
 import nigeriaStates from "./nigeriaStates.json";
 import './App.css';
+import Header from "./components/Header";
+import CityInput from "./components/CityInput";
+import ErrorMessage from "./components/ErrorMessage";
+import Loading from "./components/Loading";
+import WeatherCard from "./components/WeatherCard";
 
 
 
@@ -141,107 +144,22 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-amber-100 to-red-100 flex flex-col items-center justify-start py-8 px-2">
       <div className="w-full max-w-md bg-white/80 rounded-xl shadow-lg p-6 flex flex-col items-center">
-        <h2 className="text-3xl font-extrabold text-blue-700 mb-4 tracking-tight drop-shadow typewriter-heading">Climatic Weather</h2>
-        <form onSubmit={handleSubmit} autoComplete="off" className="w-full flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="city" className="text-lg font-semibold text-gray-700">City or State</label>
-            <input className="p-3 bg-gray-100 text-gray-900 placeholder-gray-400 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" type="text" id="city" value={city} onChange={handleInputChange} placeholder="Enter city or state name" ref={inputRef} autoComplete="off" />
-          </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>Search</button>
-          {showSuggestions && suggestions.length > 0 && (
-            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto w-full">
-              {suggestions.map((suggestionObj) => (
-                <li
-                  key={suggestionObj.display}
-                  className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-gray-800"
-                  onMouseDown={e => {
-                    e.preventDefault();
-                    handleSuggestionClick(suggestionObj);
-                  }}
-                  tabIndex={0}
-                  aria-label={`Search weather for ${suggestionObj.display}`}
-                >
-                  {suggestionObj.display}
-                </li>
-              ))}
-            </ul>
-          )}
-        </form>
+        <Header />
+        <CityInput
+          city={city}
+          onChange={handleInputChange}
+          onSubmit={handleSubmit}
+          inputRef={inputRef}
+          loading={loading}
+          suggestions={suggestions}
+          showSuggestions={showSuggestions}
+          onSuggestionClick={handleSuggestionClick}
+        />
         <div className="w-full mt-4 min-h-[32px] flex items-center justify-center">
-          {error && <span className="text-red-600 font-semibold text-center">{error}</span>}
-          {loading && <div className="text-blue-600 font-semibold">Loading...</div>}
+          {error && <ErrorMessage error={error} />}
+          {loading && <Loading />}
         </div>
-        {weather && (() => {
-          const temp = weather.main.temp;
-          let bgColor = "bg-white";
-          let tempMsg = "";
-          if (temp < 18) {
-            bgColor = "bg-blue-100";
-            tempMsg = "It's cold.";
-          } else if (temp >= 18 && temp < 28) {
-            bgColor = "bg-yellow-100";
-            tempMsg = "It's warm.";
-          } else if (temp >= 28) {
-            bgColor = "bg-red-100";
-            tempMsg = "It's hot.";
-          }
-          const description = weather.weather[0].description.toLowerCase();
-          let conditionMsg = "";
-          if (description.includes("rain")) {
-            conditionMsg = "It's going to rain.";
-          } else if (description.includes("sun") || description.includes("clear")) {
-            conditionMsg = "It's sunny.";
-          } else if (description.includes("cloud")) {
-            conditionMsg = "It's cloudy.";
-          } else if (description.includes("storm")) {
-            conditionMsg = "There might be a storm.";
-          } else if (description.includes("snow")) {
-            conditionMsg = "It might snow.";
-          } else {
-            conditionMsg = `Weather: ${weather.weather[0].description}`;
-          }
-          const windSpeed = weather.wind?.speed;
-          const windDeg = weather.wind?.deg;
-          let windMsg = "";
-          if (windSpeed !== undefined) {
-            windMsg = `Wind: ${windSpeed} m/s`;
-            if (windDeg !== undefined) {
-              const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-              const idx = Math.round(windDeg / 45) % 8;
-              windMsg += ` (${directions[idx]})`;
-            }
-          }
-          let sunriseMsg = "";
-          let sunsetMsg = "";
-          if (weather.sys?.sunrise && weather.sys?.sunset) {
-            const sunrise = new Date(weather.sys.sunrise * 1000);
-            const sunset = new Date(weather.sys.sunset * 1000);
-            sunriseMsg = `Sunrise: ${sunrise.toLocaleTimeString()}`;
-            sunsetMsg = `Sunset: ${sunset.toLocaleTimeString()}`;
-          }
-          let cityCountry = weather.name;
-          const isNigeriaState = (nigeriaStates as string[]).some(
-            s => s.toLowerCase() === city.split(',')[0].trim().toLowerCase()
-          );
-          if (isNigeriaState) {
-            cityCountry += ', Nigeria';
-          } else if (weather.sys?.country) {
-            cityCountry += `, ${weather.sys.country === 'NG' ? 'Nigeria' : weather.sys.country}`;
-          }
-          return (
-            <div className={`w-full mt-2 p-6 rounded-xl shadow-lg flex flex-col items-center gap-3 transition ${bgColor}`}>
-              <h3 className="text-2xl font-bold text-blue-700 mb-2 drop-shadow">{cityCountry}</h3>
-              <img className="w-24 h-24 mb-2" src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt={weather.weather[0].description} />
-              <p className="text-lg font-semibold text-gray-800">Temperature: {weather.main.temp}°C</p>
-              <p className="text-gray-700 italic">{tempMsg}</p>
-              <p className="text-gray-700">Humidity: {weather.main.humidity}%</p>
-              <p className="text-gray-700">{conditionMsg}</p>
-              {windMsg && <p className="text-gray-700">{windMsg}</p>}
-              {sunriseMsg && <p className="text-gray-700">{sunriseMsg}</p>}
-              {sunsetMsg && <p className="text-gray-700">{sunsetMsg}</p>}
-            </div>
-          );
-        })()}
+        {weather && <WeatherCard weather={weather} city={city} />}
       </div>
     </div>
   );
