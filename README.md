@@ -1,14 +1,37 @@
 ## Weather App with City Suggestions (Vite + React + TypeScript)
 
-This guide will help you build a weather app where users can search for the weather in different cities, with real-time city suggestions as they type.
+This project is a weather application built with Vite, React, and TypeScript. It allows users to search for weather information by city, providing real-time city suggestions as they type.
 
 ---
 
-### 1. Get a Weather API Key
-- Sign up at [OpenWeatherMap](https://openweathermap.org/) or a similar service and obtain your API key.
+### Key Features
+*   **City Search:** Users can type in a city name to search for weather information.
+*   **Real-time Suggestions:** As the user types, the app provides suggestions for cities matching the input.
+*   **Weather Display:** The app displays relevant weather information for the selected city, such as temperature and description.
 
-### 2. Set Up the API Key
-- Create a file at `src/apiKey.tsx`:
+---
+
+### 1. Prerequisites
+Before you begin, ensure you have the following installed:
+*   Node.js
+*   npm or yarn
+
+### 2. Getting Started
+
+#### 2.1. Clone the Repository
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+#### 2.2. Install Dependencies
+```bash
+npm install # or yarn install
+```
+
+#### 2.3. Set Up the API Key
+*   Sign up at [OpenWeatherMap](https://openweathermap.org/) or a similar service and obtain your API key.
+*   Create a file at `src/apiKey.tsx`:
   ```ts
   // src/apiKey.tsx
   export const API_KEY = "YOUR_API_KEY_HERE";

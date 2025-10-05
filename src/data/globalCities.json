@@ -1,0 +1,22 @@
+[
+  { "name": "London", "country": "United Kingdom" },
+  { "name": "Paris", "country": "France" },
+  { "name": "New York", "country": "United States" },
+  { "name": "Tokyo", "country": "Japan" },
+  { "name": "Beijing", "country": "China" },
+  { "name": "Berlin", "country": "Germany" },
+  { "name": "Toronto", "country": "Canada" },
+  { "name": "Cape Town", "country": "South Africa" },
+  { "name": "Sydney", "country": "Australia" },
+  { "name": "Moscow", "country": "Russia" },
+  { "name": "Lagos", "country": "Nigeria" },
+  { "name": "Accra", "country": "Ghana" },
+  { "name": "Nairobi", "country": "Kenya" },
+  { "name": "Dubai", "country": "United Arab Emirates" },
+  { "name": "Rome", "country": "Italy" },
+  { "name": "Madrid", "country": "Spain" },
+  { "name": "São Paulo", "country": "Brazil" },
+  { "name": "Buenos Aires", "country": "Argentina" },
+  { "name": "Cairo", "country": "Egypt" },
+  { "name": "Istanbul", "country": "Turkey" }
+]

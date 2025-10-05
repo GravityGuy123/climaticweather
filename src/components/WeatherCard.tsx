@@ -1,5 +1,5 @@
 import React from "react";
-import nigeriaStates from "../nigeriaStates.json";
+// import nigeriaStates from "../nigeriaStates.json";
 
 interface WeatherData {
   name: string;
@@ -19,46 +19,41 @@ interface WeatherData {
   };
 }
 
-const WeatherCard: React.FC<{ weather: WeatherData; city: string }> = ({ weather, city }) => {
+const WeatherCard: React.FC<{ weather: WeatherData; city: string }> = ({ weather }) => {
   const temp = weather.main.temp;
   let bgColor = "bg-white";
   let tempMsg = "";
+
   if (temp < 18) {
     bgColor = "bg-blue-100";
     tempMsg = "It's cold.";
   } else if (temp >= 18 && temp < 28) {
     bgColor = "bg-yellow-100";
     tempMsg = "It's warm.";
-  } else if (temp >= 28) {
+  } else {
     bgColor = "bg-red-100";
     tempMsg = "It's hot.";
   }
+
   const description = weather.weather[0].description.toLowerCase();
   let conditionMsg = "";
-  if (description.includes("rain")) {
-    conditionMsg = "It's going to rain.";
-  } else if (description.includes("sun") || description.includes("clear")) {
-    conditionMsg = "It's sunny.";
-  } else if (description.includes("cloud")) {
-    conditionMsg = "It's cloudy.";
-  } else if (description.includes("storm")) {
-    conditionMsg = "There might be a storm.";
-  } else if (description.includes("snow")) {
-    conditionMsg = "It might snow.";
-  } else {
-    conditionMsg = `Weather: ${weather.weather[0].description}`;
-  }
-  const windSpeed = weather.wind?.speed;
-  const windDeg = weather.wind?.deg;
+  if (description.includes("rain")) conditionMsg = "It's going to rain.";
+  else if (description.includes("sun") || description.includes("clear")) conditionMsg = "It's sunny.";
+  else if (description.includes("cloud")) conditionMsg = "It's cloudy.";
+  else if (description.includes("storm")) conditionMsg = "There might be a storm.";
+  else if (description.includes("snow")) conditionMsg = "It might snow.";
+  else conditionMsg = `Weather: ${weather.weather[0].description}`;
+
   let windMsg = "";
-  if (windSpeed !== undefined) {
-    windMsg = `Wind: ${windSpeed} m/s`;
-    if (windDeg !== undefined) {
+  if (weather.wind?.speed !== undefined) {
+    windMsg = `Wind: ${weather.wind.speed} m/s`;
+    if (weather.wind.deg !== undefined) {
       const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-      const idx = Math.round(windDeg / 45) % 8;
+      const idx = Math.round(weather.wind.deg / 45) % 8;
       windMsg += ` (${directions[idx]})`;
     }
   }
+
   let sunriseMsg = "";
   let sunsetMsg = "";
   if (weather.sys?.sunrise && weather.sys?.sunset) {
@@ -67,19 +62,22 @@ const WeatherCard: React.FC<{ weather: WeatherData; city: string }> = ({ weather
     sunriseMsg = `Sunrise: ${sunrise.toLocaleTimeString()}`;
     sunsetMsg = `Sunset: ${sunset.toLocaleTimeString()}`;
   }
-  let cityCountry = weather.name;
-  const isNigeriaState = (nigeriaStates as string[]).some(
-    s => s.toLowerCase() === city.split(',')[0].trim().toLowerCase()
-  );
-  if (isNigeriaState) {
-    cityCountry += ', Nigeria';
-  } else if (weather.sys?.country) {
-    cityCountry += `, ${weather.sys.country === 'NG' ? 'Nigeria' : weather.sys.country}`;
-  }
+
+  // ✅ Clean duplicate “Nigeria” entries
+  let cityCountry = weather.name.trim();
+  cityCountry = cityCountry
+    .replace(/, nigeria, nigeria$/i, ", Nigeria")
+    .replace(/, nigeria$/i, ", Nigeria")
+    .replace(/, nigeria,?$/i, ", Nigeria");
+
   return (
     <div className={`w-full mt-2 p-6 rounded-xl shadow-lg flex flex-col items-center gap-3 transition ${bgColor}`}>
       <h3 className="text-2xl font-bold text-blue-700 mb-2 drop-shadow">{cityCountry}</h3>
-      <img className="w-24 h-24 mb-2" src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt={weather.weather[0].description} />
+      <img
+        className="w-24 h-24 mb-2"
+        src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+        alt={weather.weather[0].description}
+      />
       <p className="text-lg font-semibold text-gray-800">Temperature: {weather.main.temp}°C</p>
       <p className="text-gray-700 italic">{tempMsg}</p>
       <p className="text-gray-700">Humidity: {weather.main.humidity}%</p>
